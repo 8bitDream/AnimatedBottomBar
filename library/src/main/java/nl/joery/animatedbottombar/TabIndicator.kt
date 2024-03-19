@@ -123,8 +123,8 @@ internal class TabIndicator(
                 val bottom: Float
 
                 if (bottomBar.isVerticalBar && bottomBar.longEdgeIndicator) {
-                    top = viewLeft
-                    bottom = top + viewWidth
+                    top = viewLeft + indicatorMargin
+                    bottom = top + viewWidth - indicatorMargin
                     when (bottomBar.indicatorStyle.indicatorLocation) {
                         AnimatedBottomBar.IndicatorLocation.TOP -> {
                             left = 0f
@@ -137,8 +137,8 @@ internal class TabIndicator(
                         }
                     }
                 } else if (!bottomBar.isVerticalBar && !bottomBar.longEdgeIndicator) {
-                    top = 0f
-                    bottom = parent.height.toFloat()
+                    top = 0f + indicatorMargin
+                    bottom = parent.height.toFloat() - indicatorMargin
                     when (bottomBar.indicatorStyle.indicatorLocation) {
                         AnimatedBottomBar.IndicatorLocation.TOP -> {
                             left = viewLeft
@@ -152,8 +152,8 @@ internal class TabIndicator(
                     }
                 } else {
                     if (bottomBar.isVerticalBar) {
-                        left = 0f
-                        right = parent.width.toFloat()
+                        left = 0f + indicatorMargin
+                        right = parent.width.toFloat() - indicatorMargin
                     } else {
                         left = viewLeft + indicatorMargin
                         right = viewLeft + viewWidth - indicatorMargin
