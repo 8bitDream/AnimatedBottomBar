@@ -69,5 +69,6 @@
         <attr name="abb_badgeTextColor" format="color" />
         <attr name="abb_badgeTextSize" format="dimension" />
         <attr name="abb_isVerticalBar" format="boolean" />
+        <attr name="abb_portraitIndicator" format="boolean" />
     </declare-styleable>
 </resources>

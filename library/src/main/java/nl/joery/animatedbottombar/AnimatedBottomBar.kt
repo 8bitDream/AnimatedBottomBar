@@ -81,6 +81,10 @@ class AnimatedBottomBar @JvmOverloads constructor(
                 R.styleable.AnimatedBottomBar_abb_isVerticalBar,
                 isVerticalBar
             )
+            isIndicatorVertical = attr.getBoolean(
+                R.styleable.AnimatedBottomBar_abb_portraitIndicator,
+                isIndicatorVertical
+            )
         } finally {
             attr.recycle()
         }
@@ -842,6 +846,7 @@ class AnimatedBottomBar @JvmOverloads constructor(
             field = value
         }
 
+    var isIndicatorVertical = true
 
     var selectedTabType
         get() = tabStyle.selectedTabType
