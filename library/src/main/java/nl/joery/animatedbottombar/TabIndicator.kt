@@ -132,8 +132,8 @@ internal class TabIndicator(
                         }
 
                         AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
-                            left = parent.width.toFloat()
-                            right = parent.width.toFloat() - indicatorHeight
+                            right = parent.width.toFloat()
+                            left = right - indicatorHeight
                         }
                     }
                 } else if (!bottomBar.isVerticalBar && !bottomBar.longEdgeIndicator) {
@@ -146,8 +146,8 @@ internal class TabIndicator(
                         }
 
                         AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
-                            left = viewLeft + viewWidth - indicatorHeight
                             right = viewLeft + viewWidth
+                            left = right - indicatorHeight
                         }
                     }
                 } else {
@@ -160,23 +160,21 @@ internal class TabIndicator(
                     }
                     when (bottomBar.indicatorStyle.indicatorLocation) {
                         AnimatedBottomBar.IndicatorLocation.TOP -> {
-                            if (bottomBar.isVerticalBar) {
-                                top = viewLeft
-                                bottom = top + indicatorHeight
+                            top = if (bottomBar.isVerticalBar) {
+                                viewLeft
                             } else {
-                                top = 0f
-                                bottom = indicatorHeight
+                                0f
                             }
+                            bottom = top + indicatorHeight
                         }
 
                         AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
-                            if (bottomBar.isVerticalBar) {
-                                bottom = viewLeft + viewWidth
-                                top = bottom - indicatorHeight
+                            bottom = if (bottomBar.isVerticalBar) {
+                                viewLeft + viewWidth
                             } else {
-                                bottom = parent.height.toFloat()
-                                top = bottom - indicatorHeight
+                                parent.height.toFloat()
                             }
+                            top = bottom - indicatorHeight
                         }
                     }
                 }
@@ -190,24 +188,69 @@ internal class TabIndicator(
                 // (rx, ry arguments in Canvas.drawRoundRect).
                 // In the same way, we can make top corners round, but we have to translate to bottom
 
+                val left: Float
                 val top: Float
+                val right: Float
                 val bottom: Float
 
-                when(bottomBar.indicatorStyle.indicatorLocation) {
-                    AnimatedBottomBar.IndicatorLocation.TOP -> {
-                        top = -indicatorHeight
-                        bottom = indicatorHeight
+                if (bottomBar.isVerticalBar && bottomBar.longEdgeIndicator) {
+                    top = viewLeft
+                    bottom = viewLeft + viewWidth
+                    when(bottomBar.indicatorStyle.indicatorLocation) {
+                        AnimatedBottomBar.IndicatorLocation.TOP -> {
+                            left = -indicatorHeight
+                            right = indicatorHeight
+                        }
+
+                        AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
+                            val width = viewLeft + viewWidth
+                            left = width - indicatorHeight
+                            right = width + indicatorHeight
+                        }
                     }
-                    AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
-                        val parentHeight = parent.height.toFloat()
-                        top = parentHeight - indicatorHeight
-                        bottom = parentHeight + indicatorHeight
+                } else if (!bottomBar.isVerticalBar && !bottomBar.longEdgeIndicator) {
+                    top = 0f
+                    bottom = parent.height.toFloat()
+                    when(bottomBar.indicatorStyle.indicatorLocation) {
+                        AnimatedBottomBar.IndicatorLocation.TOP -> {
+                            left = -indicatorHeight
+                            right = indicatorHeight
+                        }
+
+                        AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
+                            val width = viewLeft + viewWidth
+                            left = width - indicatorHeight
+                            right = width + indicatorHeight
+                        }
+                    }
+                } else {
+                    if (bottomBar.isVerticalBar) {
+                        left = 0f
+                        right = parent.width.toFloat()
+                    } else {
+                        left = viewLeft + indicatorMargin
+                        right = viewLeft + viewWidth - indicatorMargin
+                    }
+                    when (bottomBar.indicatorStyle.indicatorLocation) {
+                        AnimatedBottomBar.IndicatorLocation.TOP -> {
+                            top = -indicatorHeight
+                            bottom = indicatorHeight
+                        }
+
+                        AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
+                            val parentHeight = if (bottomBar.isVerticalBar)
+                                viewLeft + viewWidth
+                            else
+                                parent.height.toFloat()
+                            top = parentHeight - indicatorHeight
+                            bottom = parentHeight + indicatorHeight
+                        }
                     }
                 }
 
                 // The reason of using RectF is that Canvas.drawRoundRect(RectF, float, float) is available
                 // only since API 21
-                indicatorRect.set(viewLeft + indicatorMargin, top, viewLeft + viewWidth - indicatorMargin, bottom)
+                indicatorRect.set(left, top, right, bottom)
 
                 c.drawRoundRect(indicatorRect, indicatorHeight, indicatorHeight, paint)
             }
