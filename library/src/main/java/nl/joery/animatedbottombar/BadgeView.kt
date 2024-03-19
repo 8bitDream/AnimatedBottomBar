@@ -47,10 +47,12 @@ class BadgeView @JvmOverloads constructor(
         }
 
         addListener(object : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator?) {
+
+            override fun onAnimationStart(p0: Animator) {
+                visibility = VISIBLE
             }
 
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(p0: Animator) {
                 if (!isEnabled) {
                     visibility = GONE
                 }
@@ -68,12 +70,9 @@ class BadgeView @JvmOverloads constructor(
                 }
             }
 
-            override fun onAnimationCancel(animation: Animator?) {
-            }
+            override fun onAnimationCancel(p0: Animator) { }
 
-            override fun onAnimationStart(animation: Animator?) {
-                visibility = VISIBLE
-            }
+            override fun onAnimationRepeat(p0: Animator) { }
         })
     }
 

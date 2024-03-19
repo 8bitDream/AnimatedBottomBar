@@ -33,6 +33,8 @@ internal class TabAdapter(
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
 
+            isVerticalBar = bottomBar.isVerticalBar
+
             clipChildren = false
             clipToPadding = false
         }

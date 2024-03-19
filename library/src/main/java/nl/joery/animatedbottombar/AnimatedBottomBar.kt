@@ -48,11 +48,26 @@ class AnimatedBottomBar @JvmOverloads constructor(
     private var viewPager: ViewPager? = null
     private var viewPager2: ViewPager2? = null
 
+    var isVerticalBar = false
+
     init {
+        initEarlyAttributes(attrs)
         initRecyclerView()
         initAdapter()
         initTabIndicator()
         initAttributes(attrs)
+    }
+
+    private fun initEarlyAttributes(
+        attributeSet: AttributeSet?
+    ) {
+        val attr: TypedArray =
+            context.obtainStyledAttributes(attributeSet, R.styleable.AnimatedBottomBar, 0, 0)
+        try {
+            isVerticalBar = attr.getBoolean(R.styleable.AnimatedBottomBar_abb_isVerticalBar, false)
+        } finally {
+            attr.recycle()
+        }
     }
 
     private fun initAttributes(
@@ -111,14 +126,16 @@ class AnimatedBottomBar @JvmOverloads constructor(
             )
 
             // Ripple
-            rippleEnabled = attr.getBoolean(
-                R.styleable.AnimatedBottomBar_abb_rippleEnabled,
-                tabStyle.rippleEnabled
-            )
-            rippleColor = attr.getColor(
-                R.styleable.AnimatedBottomBar_abb_rippleColor,
-                tabStyle.rippleColor
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                rippleEnabled = attr.getBoolean(
+                    R.styleable.AnimatedBottomBar_abb_rippleEnabled,
+                    tabStyle.rippleEnabled
+                )
+                rippleColor = attr.getColor(
+                    R.styleable.AnimatedBottomBar_abb_rippleColor,
+                    tabStyle.rippleColor
+                )
+            }
 
             // Colors
             tabColorSelected = attr.getColor(
@@ -237,7 +254,9 @@ class AnimatedBottomBar @JvmOverloads constructor(
         recycler.overScrollMode = View.OVER_SCROLL_NEVER
         recycler.contentDescription = contentDescription
 
-        val flexLayoutManager = FlexboxLayoutManager(context, FlexDirection.ROW, FlexWrap.NOWRAP)
+        val flexLayoutManager = FlexboxLayoutManager(
+            context, if (isVerticalBar) FlexDirection.COLUMN else FlexDirection.ROW, FlexWrap.NOWRAP
+        )
         recycler.layoutManager = flexLayoutManager
         addView(recycler)
     }
@@ -1077,7 +1096,7 @@ class AnimatedBottomBar @JvmOverloads constructor(
         }
 
     class Tab internal constructor(
-        val icon: Drawable,
+        val icon: Drawable?,
         var iconSize: Int = -1,
         val title: String,
         @IdRes val id: Int = -1,

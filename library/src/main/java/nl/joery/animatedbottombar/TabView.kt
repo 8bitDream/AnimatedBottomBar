@@ -102,6 +102,8 @@ internal class TabView @JvmOverloads constructor(
             updateBadge()
         }
 
+    var isVerticalBar = false
+
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
 
@@ -124,7 +126,7 @@ internal class TabView @JvmOverloads constructor(
                 gravity = Gravity.CENTER
             }
             gravity = Gravity.CENTER
-            orientation = LinearLayout.HORIZONTAL
+            orientation = if (isVerticalBar) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
 
             textLayout = this
 
@@ -175,7 +177,7 @@ internal class TabView @JvmOverloads constructor(
                     gravity = Gravity.CENTER
                 }
 
-                orientation = LinearLayout.HORIZONTAL
+                orientation = if (isVerticalBar) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
                 iconView = this
                 scaleType = ImageView.ScaleType.FIT_CENTER
             })
@@ -435,6 +437,8 @@ internal class TabView @JvmOverloads constructor(
 
                 animation = AlphaAnimation(valueFrom, valueTo)
             }
+
+            AnimatedBottomBar.TabAnimation.NONE -> { }
         }
 
         return animation?.apply {
