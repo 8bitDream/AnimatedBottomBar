@@ -14,7 +14,16 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
-import androidx.annotation.*
+import androidx.annotation.AnimRes
+import androidx.annotation.BoolRes
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.Dimension
+import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
+import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
+import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +32,12 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayoutManager
-import nl.joery.animatedbottombar.utils.*
+import nl.joery.animatedbottombar.utils.MenuParser
+import nl.joery.animatedbottombar.utils.NavigationComponentHelper
+import nl.joery.animatedbottombar.utils.Utils
+import nl.joery.animatedbottombar.utils.dpPx
+import nl.joery.animatedbottombar.utils.getColorResCompat
+import nl.joery.animatedbottombar.utils.getTextColor
 
 
 class AnimatedBottomBar @JvmOverloads constructor(
@@ -48,8 +62,6 @@ class AnimatedBottomBar @JvmOverloads constructor(
     private var viewPager: ViewPager? = null
     private var viewPager2: ViewPager2? = null
 
-    var isVerticalBar = false
-
     init {
         initEarlyAttributes(attrs)
         initRecyclerView()
@@ -64,7 +76,11 @@ class AnimatedBottomBar @JvmOverloads constructor(
         val attr: TypedArray =
             context.obtainStyledAttributes(attributeSet, R.styleable.AnimatedBottomBar, 0, 0)
         try {
-            isVerticalBar = attr.getBoolean(R.styleable.AnimatedBottomBar_abb_isVerticalBar, false)
+            // Orientation
+            isVerticalBar = attr.getBoolean(
+                R.styleable.AnimatedBottomBar_abb_isVerticalBar,
+                isVerticalBar
+            )
         } finally {
             attr.recycle()
         }
@@ -814,6 +830,18 @@ class AnimatedBottomBar @JvmOverloads constructor(
         }
         return -1
     }
+
+
+    var isVerticalBar = false
+        set(value) {
+            if (this::recycler.isInitialized) {
+                recycler.layoutManager = FlexboxLayoutManager(
+                    context, if (value) FlexDirection.COLUMN else FlexDirection.ROW, FlexWrap.NOWRAP
+                )
+            }
+            field = value
+        }
+
 
     var selectedTabType
         get() = tabStyle.selectedTabType
