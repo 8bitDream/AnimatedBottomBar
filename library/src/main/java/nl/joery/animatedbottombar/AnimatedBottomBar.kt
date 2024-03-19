@@ -15,7 +15,6 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import androidx.annotation.AnimRes
-import androidx.annotation.BoolRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.Dimension
@@ -81,9 +80,9 @@ class AnimatedBottomBar @JvmOverloads constructor(
                 R.styleable.AnimatedBottomBar_abb_isVerticalBar,
                 isVerticalBar
             )
-            isIndicatorVertical = attr.getBoolean(
+            longEdgeIndicator = attr.getBoolean(
                 R.styleable.AnimatedBottomBar_abb_portraitIndicator,
-                isIndicatorVertical
+                longEdgeIndicator
             )
         } finally {
             attr.recycle()
@@ -846,7 +845,8 @@ class AnimatedBottomBar @JvmOverloads constructor(
             field = value
         }
 
-    var isIndicatorVertical = true
+    // Place a vertical indicator on a vertical bar and horizontal on horizontal
+    var longEdgeIndicator = true
 
     var selectedTabType
         get() = tabStyle.selectedTabType

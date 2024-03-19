@@ -113,19 +113,51 @@ internal class TabIndicator(
         val indicatorMargin = bottomBar.indicatorStyle.indicatorMargin
         paint.alpha = alpha
 
-        val indicatorLeft = viewLeft + indicatorMargin
-        val indicatorRight = viewLeft + viewWidth - indicatorMargin
         val indicatorHeight =  bottomBar.indicatorStyle.indicatorHeight.toFloat()
 
         when(bottomBar.indicatorStyle.indicatorAppearance) {
             AnimatedBottomBar.IndicatorAppearance.SQUARE -> {
+                val left: Float
                 val top: Float
+                val right: Float
                 val bottom: Float
 
-                if (bottomBar.isVerticalBar && bottomBar.isIndicatorVertical) {
+                if (bottomBar.isVerticalBar && bottomBar.longEdgeIndicator) {
                     top = viewLeft
                     bottom = top + viewWidth
+                    when (bottomBar.indicatorStyle.indicatorLocation) {
+                        AnimatedBottomBar.IndicatorLocation.TOP -> {
+                            left = 0f
+                            right = indicatorHeight
+                        }
+
+                        AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
+                            left = parent.width.toFloat()
+                            right = parent.width.toFloat() - indicatorHeight
+                        }
+                    }
+                } else if (!bottomBar.isVerticalBar && !bottomBar.longEdgeIndicator) {
+                    top = 0f
+                    bottom = parent.height.toFloat()
+                    when (bottomBar.indicatorStyle.indicatorLocation) {
+                        AnimatedBottomBar.IndicatorLocation.TOP -> {
+                            left = viewLeft
+                            right = indicatorHeight
+                        }
+
+                        AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
+                            left = viewLeft + viewWidth - indicatorHeight
+                            right = viewLeft + viewWidth
+                        }
+                    }
                 } else {
+                    if (bottomBar.isVerticalBar) {
+                        left = 0f
+                        right = parent.width.toFloat()
+                    } else {
+                        left = viewLeft + indicatorMargin
+                        right = viewLeft + viewWidth - indicatorMargin
+                    }
                     when (bottomBar.indicatorStyle.indicatorLocation) {
                         AnimatedBottomBar.IndicatorLocation.TOP -> {
                             if (bottomBar.isVerticalBar) {
@@ -149,24 +181,7 @@ internal class TabIndicator(
                     }
                 }
 
-                if (bottomBar.isVerticalBar && bottomBar.isIndicatorVertical) {
-                    when(bottomBar.indicatorStyle.indicatorLocation) {
-                        AnimatedBottomBar.IndicatorLocation.TOP -> {
-                            c.drawRect(0f, top, indicatorHeight, bottom, paint)
-                        }
-
-                        AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
-                            c.drawRect(
-                                parent.width.toFloat(), top,
-                                parent.width.toFloat() - indicatorHeight, bottom,
-                                paint
-                            )
-                        }
-                    }
-                } else if (bottomBar.isVerticalBar)
-                    c.drawRect(0f, top, parent.width.toFloat(), bottom, paint)
-                else
-                    c.drawRect(indicatorLeft, top, indicatorRight, bottom, paint)
+                c.drawRect(left, top, right, bottom, paint)
             }
             AnimatedBottomBar.IndicatorAppearance.ROUND -> {
                 // Canvas.drawRoundRect draws rectangle with all round corners.
@@ -192,7 +207,7 @@ internal class TabIndicator(
 
                 // The reason of using RectF is that Canvas.drawRoundRect(RectF, float, float) is available
                 // only since API 21
-                indicatorRect.set(indicatorLeft, top, indicatorRight, bottom)
+                indicatorRect.set(viewLeft + indicatorMargin, top, viewLeft + viewWidth - indicatorMargin, bottom)
 
                 c.drawRoundRect(indicatorRect, indicatorHeight, indicatorHeight, paint)
             }
