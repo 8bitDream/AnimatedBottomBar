@@ -47,15 +47,24 @@ internal class TabIndicator(
         val lastView = parent.getChildAt(lastSelectedIndex)
         val newView = parent.getChildAt(adapter.selectedIndex) ?: return
 
-        val newViewWidth = newView.width.toFloat()
-        val newViewLeft = newView.left.toFloat()
+        val newViewWidth = if (bottomBar.isVerticalBar)
+            newView.height.toFloat()
+        else
+            newView.width.toFloat()
+        val newViewLeft =  if (bottomBar.isVerticalBar)
+            newView.top.toFloat()
+        else
+            newView.left.toFloat()
 
         var currentWidth = newViewWidth
 
         when(bottomBar.indicatorAnimation) {
             AnimatedBottomBar.IndicatorAnimation.SLIDE -> {
                 if (isAnimating && lastView != null) {
-                    val lastViewWidth = lastView.width.toFloat()
+                    val lastViewWidth = if (bottomBar.isVerticalBar)
+                        lastView.height.toFloat()
+                    else
+                        lastView.width.toFloat()
                     currentWidth =
                         lastViewWidth + (newViewWidth - lastViewWidth) * animatedFraction
                 } else {
@@ -69,12 +78,21 @@ internal class TabIndicator(
                     val newAlpha = 255f * animatedFraction
                     val lastAlpha = 255f - newAlpha
 
-                    drawIndicator(
-                        c,
-                        lastView.left.toFloat(),
-                        lastView.width.toFloat(),
-                        lastAlpha.toInt()
-                    )
+                    if (bottomBar.isVerticalBar) {
+                        drawIndicator(
+                            c,
+                            lastView.top.toFloat(),
+                            lastView.height.toFloat(),
+                            lastAlpha.toInt()
+                        )
+                    } else {
+                        drawIndicator(
+                            c,
+                            lastView.left.toFloat(),
+                            lastView.width.toFloat(),
+                            lastAlpha.toInt()
+                        )
+                    }
                     drawIndicator(
                         c,
                         newViewLeft,
@@ -106,17 +124,30 @@ internal class TabIndicator(
 
                 when(bottomBar.indicatorStyle.indicatorLocation) {
                     AnimatedBottomBar.IndicatorLocation.TOP -> {
-                        top = 0f
-                        bottom = indicatorHeight
+                        if (bottomBar.isVerticalBar) {
+                            top = indicatorLeft
+                            bottom = indicatorLeft + indicatorHeight
+                        } else {
+                            top = 0f
+                            bottom = indicatorHeight
+                        }
                     }
                     AnimatedBottomBar.IndicatorLocation.BOTTOM -> {
-                        val parentHeight = parent.height.toFloat()
-                        top = parentHeight - indicatorHeight
-                        bottom = parentHeight
+                        if (bottomBar.isVerticalBar) {
+                            top = indicatorRight
+                            bottom = indicatorRight - indicatorHeight
+                        } else {
+                            val parentHeight = parent.height.toFloat()
+                            top = parentHeight - indicatorHeight
+                            bottom = parentHeight
+                        }
                     }
                 }
 
-                c.drawRect(indicatorLeft, top, indicatorRight, bottom, paint)
+                if (bottomBar.isVerticalBar)
+                    c.drawRect(0f, top, parent.width.toFloat(), bottom, paint)
+                else
+                    c.drawRect(indicatorLeft, top, indicatorRight, bottom, paint)
             }
             AnimatedBottomBar.IndicatorAppearance.ROUND -> {
                 // Canvas.drawRoundRect draws rectangle with all round corners.
@@ -169,7 +200,10 @@ internal class TabIndicator(
         lastSelectedIndex = lastIndex
 
         animator.run {
-            setFloatValues(currentLeft, newView.left.toFloat())
+            if (bottomBar.isVerticalBar)
+                setFloatValues(currentLeft, newView.top.toFloat())
+            else
+                setFloatValues(currentLeft, newView.left.toFloat())
             duration = bottomBar.tabStyle.animationDuration.toLong()
             interpolator = bottomBar.tabStyle.animationInterpolator
 
